@@ -91,16 +91,11 @@ const CMQSection = () => {
   // trim of dataset 
   const formatDataset = (dataset, start, end, n) => {
     //trim dataset which has a longer date range than the (longest) historical data
-    if (start < -n + 1) {
-      dataset = dataset.slice(-start - n + 1);
-    }
-
-    const extendedDataset = [...dataset]; // Create a shallow copy of the original dataset
-  
+    if (start < -n + 1) {dataset = dataset.slice(-start - n + 1);}
+    const extendedDataset = [...dataset];
     while (extendedDataset.length < n) {
       extendedDataset.push(null); // Add null values to the end of the dataset until it reaches the desired length
     }
-  
     return extendedDataset;
   }
 
@@ -236,39 +231,13 @@ const CMQSection = () => {
       }).then(data => {
         //decode message
         const res=data.json();
-        console.log('non-historical', res);
         return res;
       }).then((res)=>{
         //res.data contains the data from the backend
         //manipulate data
         var dataset = formatDataset(res.data.data, res.data.lower, res.data.upper, CMQData.labels.length);
-        console.log('dataset', dataset);
-        //dataset.push.apply(dataset,res.data.data);
-        // setCMQData((prevData) => {
-        //   dataset = Array.from({ length: prevData.datasets[0].data.length - res.data.length }).fill(0);
-        //   dataset.push.apply(dataset,res.data);
-        //   return {
-        //     labels: prevData.labels,
-        //     //keep the order so the id curve is always on top
-        //     datasets: [prevData.datasets[0],prevData.datasets[1], prevData.datasets[2],{
-        //       label: `${id}`,
-        //       type: "line",
-        //       backgroundColor: "rgb(255,97,36, 0.5)",
-        //       borderColor: "rgba(255,97,36, 1)",
-        //       hoverBorderColor: "rgb(255,97,36)",
-        //       fill: false,
-        //       tension: 0,
-        //       data: dataset,
-        //       yAxisID: 'y',
-        //       xAxisID: 'x'
-        //     }],
-        //   }
-        // });
         setCMQData((prevData) => {
           //make the dataset as long as the historical data fill with nulls
-          //dataset = Array.from({ length: prevData.datasets[0].data.length - res.data.length }).fill(0);
-          //console.log('dataset', dataset)
-          //console.log(dataset)
           return {
             labels: prevData.labels,
             //keep the order so the id curve is always on top

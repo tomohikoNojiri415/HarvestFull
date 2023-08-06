@@ -85,6 +85,17 @@ const BookingCurveSection = () => {
     ],
   });
 
+  // trim of dataset 
+  const formatDataset = (dataset, start, end, n) => {
+    //trim dataset which has a longer date range than the (longest) historical data
+    if (start < -n + 1) {dataset = dataset.slice(-start - n + 1);}
+    const extendedDataset = [...dataset];
+    while (extendedDataset.length < n) {
+      extendedDataset.push(null); // Add null values to the end of the dataset until it reaches the desired length
+    }
+    return extendedDataset;
+  }
+
   //fetching a list of ids
   //the resulting list has a 0 at the start when page load !!reserve 0 for no ship selected
   const fetchIds = () => {
@@ -119,12 +130,11 @@ const BookingCurveSection = () => {
           "Content-Type": "application/json",
         },
       }).then(data => {
-        console.log("history 2");
         //decode message
         const res=data.json();
         return res;
       }).then((res)=>{
-        console.log("history 3");
+        console.log('historical data', res.data);
         const mean = res.data.mean;
         const lower = res.data.lower;
         const upper = res.data.upper;
@@ -135,12 +145,6 @@ const BookingCurveSection = () => {
         setBookingData({
           labels: labels,
           datasets: [
-            // {
-            //   label:'Historical Bookings',
-            //   data: mean,
-            //   borderColor: 'rgba(75, 192, 192, 1)',
-            //   backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            // },
             {
               label: "Historical Mean",
               type: "line",
@@ -186,7 +190,6 @@ const BookingCurveSection = () => {
       //id = parseInt(id);
       //console.log('fetching for',id);
       const url = `http://127.0.0.1:5000/booking/${id}`;
-      let dataset = [];
       fetch(url,{
         method: 'GET',
         mode: 'cors',
@@ -198,12 +201,13 @@ const BookingCurveSection = () => {
         const res=data.json();
         return res;
       }).then((res)=>{
+        console.log('id data', res.data);
         //res.data contains the data from the backend
         //manipulate data
-        dataset.push.apply(dataset,res.data);
+        var dataset = formatDataset(res.data.data, res.data.lower, res.data.upper, bookingData.labels.length);
         setBookingData((prevData) => {
-          dataset = Array.from({ length: prevData.datasets[0].data.length - res.data.length }).fill(0);
-          dataset.push.apply(dataset,res.data);
+          // dataset = Array.from({ length: prevData.datasets[0].data.length - res.data.length }).fill(0);
+          // dataset.push.apply(dataset,res.data);
           return {
             labels: prevData.labels,
             //keep the order so the id curve is always on top
