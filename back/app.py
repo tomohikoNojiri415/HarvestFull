@@ -27,26 +27,41 @@ def listTicketType(df,id):
         return df[df['ID'] == id]['ticket_type'].unique().tolist()
 
 def listCumBooking(df,id):
-    capacity =  df['capacity'][0]
-    df2 = df[df['ID'] == id].copy()
-    df2['booking_date'] = pd.to_datetime(df['booking_date'], format='%d/%m/%Y')
-    df2['sail_date'] = pd.to_datetime(df2['sail_date'], format='%d/%m/%Y')
-    df2['weeks'] = ((df2['booking_date'] - df2['sail_date']).dt.days / 7).astype(int)
-    result = df2.groupby('weeks').size().reset_index(name='count')
+    dfIn= pd.read_csv('data/historical/ticket_details_historical.csv')
+    idIsHistorical = True
+    if id not in dfIn['ID'].unique().tolist():
+        idIsHistorical = False
+        df= pd.read_csv('data/current/'+id+'/'+id+'.csv')
+    df = df[df['ID'] == id].copy()
+    capacity = df['capacity'].values[0]
+    df['booking_date'] = pd.to_datetime(df['booking_date'], format='%d/%m/%Y')
+    df['sail_date'] = pd.to_datetime(df['sail_date'], format='%d/%m/%Y')
+    df['weeks'] = ((df['booking_date'] - df['sail_date']).dt.days / 7).astype(int)
+    result = df.groupby('weeks').size().reset_index(name='count')
+    print('result',result)
     counts = []
-    for week in range(result['weeks'].min(), 1):
+    upperBound = 1
+    #print('result ############## \n',result)
+    print('flag',idIsHistorical)
+    print('max',result.weeks.min(), result.weeks.max())
+    if not idIsHistorical:
+        upperBound = int(round(result['weeks'].max(),0))
+
+    for week in range(result['weeks'].min(), upperBound):
         if len(counts) == 0:
             counts.append(result.loc[result['weeks'] == week, 'count'].values[0] if week in result['weeks'].values else 0)
         else:
             counts.append((result.loc[result['weeks'] == week, 'count'].values[0] + counts[-1]) if week in result['weeks'].values else counts[-1])
     counts = [round(x/capacity*100,2) for x in counts]
-    return counts
+    print('counts',counts)
+    return {'data': counts, 'weekUpper':upperBound, 'weekLower': int(round(result['weeks'].min(),0))}
+
 
 def listHistoricalBooking(df):
     lists = []
     max_length = 0
     for id in df['ID'].unique().tolist():
-        lists.append(listCumBooking(df,id))
+        lists.append(listCumBooking(df,id).get('data'))
         if len(lists[-1]) > max_length:
             max_length = len(lists[-1])
 
@@ -85,7 +100,7 @@ def CMQID(df, id, ticketType):
         dfIn = dfIn[dfIn['ticket_type'] == ticketType].copy()
 
     potentialRevenue = (dfIn['tickets_available'] * dfIn['RRP']).sum()
-    print('potentialRevenue',potentialRevenue)
+    #print('potentialRevenue',potentialRevenue)
 
     #df2 = df[df['ID'] == id & df['ticketType'] == ticketType].copy()
     df2 = df[df['ID'] == id].copy()
@@ -101,7 +116,7 @@ def CMQID(df, id, ticketType):
     counts = []
     upperBound = 1
     #print('result ############## \n',result)
-    print('max',result.weeks.min(), result.weeks.max())
+    #print('max',result.weeks.min(), result.weeks.max())
     if not idIsHistorical:
         upperBound = int(round(result['weeks'].max(),0))
     for week in range(result['weeks'].min(), upperBound):
