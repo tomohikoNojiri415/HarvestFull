@@ -58,6 +58,16 @@ const Navbar = ({ toggle }) => {
               offset={-80}
               >Class Mix Quality</NavLinks>
             </NavItem>
+            <NavItem>
+              <NavLinks 
+              to="recommendation"
+              smooth={true}
+              duration={250}
+              spy={true}
+              exact='true'
+              offset={-80}
+              >Recommendation</NavLinks>
+            </NavItem>
           </NavMenu>
           <NavBtn>
             <NavBtnLink to="/">Menu</NavBtnLink>

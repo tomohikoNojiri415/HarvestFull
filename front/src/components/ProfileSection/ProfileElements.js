@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const ProfileContainer = styled.div`
   color: #fff;
-  background: '#ed9d7e';
+  background:#ed9d7e;
   display: flex;
 
   /* @media screen and (max-width: 768px){
@@ -16,7 +16,6 @@ export const ProfileWrapper = styled.div`
   min-height: 100vh - 80px;
   width: 100%;
   padding: 3%;
-  background-color: #ed9d7e;
   //grid-template-areas: 'side main';
 `;
 
@@ -47,8 +46,7 @@ export const ProfileHeading = styled.h1`
   margin-bottom: 48px;
   line-height: 1.1;
   font-weight: 600;
-  color: #202122;
-  float: right;
+  color:#202122;
 `; 
 
 export const ProfilePara1 = styled.p`
@@ -56,7 +54,6 @@ export const ProfilePara1 = styled.p`
   font-size: 16px;
   line-height: 22px;
   color: #3F4041;
-  float: right;
 `;
 
 export const ProfilePara2 = styled.p`
@@ -65,10 +62,6 @@ export const ProfilePara2 = styled.p`
   font-size: 16px;
   line-height: 22px;
   color: #848585;
-`;
-
-export const ProfileList = styled.ul`
-  margin-left: 20px;
 `;
 
 export const ProfileChartWrapper = styled.div`

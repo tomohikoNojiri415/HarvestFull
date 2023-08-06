@@ -6,6 +6,7 @@ import Services from '../components/Services';
 import BookingCurveSection from '../components/BookingCurveSection';
 import ProfileSection from '../components/ProfileSection';
 import CMQSection from '../components/CMQSection';
+import RecommendSection from '../components/Recommendation';
 const Harvest = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => {
@@ -20,6 +21,7 @@ const Harvest = () => {
       <BookingCurveSection />
       <ProfileSection />
       <CMQSection/>
+      <RecommendSection/>
     </>
   )
 }
