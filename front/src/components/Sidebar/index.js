@@ -20,7 +20,8 @@ const Sidebar = ({isOpen, toggle}) => {
         <SidebarMenu>
           <SidebarLink to='bookingcurve' onClick={toggle}>Booking Curve</SidebarLink>
           <SidebarLink to='clientsegmentation' onClick={toggle}>Client Segmentation</SidebarLink>
-          <SidebarLink to='cmq' onClick={toggle}>CMQ</SidebarLink>
+          <SidebarLink to='cmq' onClick={toggle}>Class Mix Quality</SidebarLink>
+          <SidebarLink to='recommendation' onClick={toggle}>Recommendation</SidebarLink>
         </SidebarMenu>
         <SideBtnWrap>
           <SidebarRoute to='/'>Menu</SidebarRoute>
