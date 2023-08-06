@@ -1,4 +1,4 @@
-TicketType,RRP,ID,TicketsAvailable
+ticket_type,RRP,ID,tickets_available
 Interior_Mid,500,Ship1,90
 Interior_Aft,550,Ship1,90
 Interior_Bow,600,Ship1,90
