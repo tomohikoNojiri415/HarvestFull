@@ -64,6 +64,10 @@ export const CMQPara2 = styled.p`
   color: #848585;
 `;
 
+export const CMQList = styled.ul`
+  margin-left: 20px;
+`;
+
 export const CMQChartWrapper = styled.div`
   position: relative;
   padding: 10% 5% 18% 5%;

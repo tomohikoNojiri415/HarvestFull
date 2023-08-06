@@ -1,4 +1,4 @@
-index,bookings_cumm,day,next,bookings_daily,flag,ID,state,gender,returning_cust,ticket_type,discount,sail_date,RRP,booking_date,purchased_price,capacity
+index,bookings_cumm,day,next,bookings_daily,flag,ID,state,gender,returning_cust,cabin,discount,sail_date,RRP,booking_date,purchased_price,capacity
 0,47,-365,0,47,1,Ship8,NT,F,No,Balcony_Mid,0.24,28/4/2023,650,28/4/2022,649.76,1000
 0,47,-365,0,48,1,Ship8,ACT,F,Yes,OceanView_Bow,0.3,28/4/2023,2100,28/4/2022,2099.7,1000
 0,47,-365,0,49,1,Ship8,NSW,F,No,Interior_Mid,0.26,28/4/2023,500,28/4/2022,499.74,1000

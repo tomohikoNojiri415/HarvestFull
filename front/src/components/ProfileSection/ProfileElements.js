@@ -2,24 +2,85 @@ import styled from 'styled-components';
 
 export const ProfileContainer = styled.div`
   color: #fff;
-  background: #ed9d7e;
+  background: '#ed9d7e';
+  display: flex;
 
-  @media screen and (max-width: 768px){
+  /* @media screen and (max-width: 768px){
     padding: 100px 0;
-  }  
+  }   */
 `
 
 export const ProfileWrapper = styled.div`
-  display: grid;
-  z-index: 1;
-  height: 100vh;
+  display:inline-flex;
+  flex-wrap:wrap;
+  min-height: 100vh - 80px;
   width: 100%;
-  max-width: 1100px;
-  margin-right: auto;
-  margin-left: auto;
+  padding: 3%;
+  background-color: #ed9d7e;
+  //grid-template-areas: 'side main';
+`;
+
+export const ProfileColumn1 = styled.div`
+  float:left; 
+  width:30%;
+
+  @media screen and (max-width: 1000px){
+    width: 100%;
+  }
+`;
+
+export const ProfileColumn2 = styled.div`
+  width: 70%;
+  overflow:hidden;
+  min-height:170px;
+  //grid-area: main;
   justify-content: center;
-  grid-template-columns: 30% 70%;
-  grid-auto-rows: minmax(100px, auto);
-  grid-gap: 20px;
-  grid-template-areas: 'side main';
+  align-items: center;
+
+  @media screen and (max-width: 1000px){
+    width: 100%;
+  }
+`;
+
+export const ProfileHeading = styled.h1`
+  max-width: 24px;
+  margin-bottom: 48px;
+  line-height: 1.1;
+  font-weight: 600;
+  color: #202122;
+  float: right;
+`; 
+
+export const ProfilePara1 = styled.p`
+  margin-bottom: 35px;
+  font-size: 16px;
+  line-height: 22px;
+  color: #3F4041;
+  float: right;
+`;
+
+export const ProfilePara2 = styled.p`
+  margin-top: 35px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  line-height: 22px;
+  color: #848585;
+`;
+
+export const ProfileList = styled.ul`
+  margin-left: 20px;
+`;
+
+export const ProfileChartWrapper = styled.div`
+  position: relative;
+  padding: 10% 5% 18% 5%;
+  height: 100vh;
+
+  @media screen and (max-width: 1000px){
+    top: 0%;
+  }
+`;
+
+export const ProfileContentWrapper = styled.div`
+  padding: 5% 5% 0 5%;
 `;
