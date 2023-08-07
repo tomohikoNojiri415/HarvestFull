@@ -320,8 +320,7 @@ const CMQSection = () => {
           <CMQColumn1>
           <CMQContentWrapper>
               <CMQHeading> Class Mix Quality</CMQHeading>
-              <CMQPara1> Maximising the yield
-                </CMQPara1>
+              <CMQPara1> Maximising the yield</CMQPara1>
               <select onChange={(event)=> {setCMQId(event.target.value)}}>
                 {CMQIdList.map((id, index) => (
                   <option key={index} value={id}>

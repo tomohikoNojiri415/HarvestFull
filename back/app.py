@@ -98,34 +98,44 @@ def CMQID(df, id, ticketType):
     dfIn = dfIn[dfIn['ID'] == id].copy()
     if ticketType != 'All':
         dfIn = dfIn[dfIn['ticket_type'] == ticketType].copy()
-
     potentialRevenue = (dfIn['tickets_available'] * dfIn['RRP']).sum()
     #print('potentialRevenue',potentialRevenue)
 
     #df2 = df[df['ID'] == id & df['ticketType'] == ticketType].copy()
     df2 = df[df['ID'] == id].copy()
     #print("############ df2 ########### \n",df2)
-    if ticketType != 'All':
-        df2 = df2[df2['ticket_type'] == ticketType].copy()
     df2['booking_date'] = pd.to_datetime(df2['booking_date'], format='%d/%m/%Y')
     df2['sail_date'] = pd.to_datetime(df2['sail_date'], format='%d/%m/%Y')
     #ceil round number closer to 0 i.e -9.8 -> -9
     df2['weeks'] = ((df2['booking_date'] - df2['sail_date']).dt.days / 7).astype(int)
+    minWeek = df2['weeks'].min()
+    maxWeek = df2['weeks'].max()
     #print('weeks',df2['weeks'])
+    if ticketType != 'All':
+        df2 = df2[df2['ticket_type'] == ticketType].copy()
     result = df2[['purchased_price','weeks']].groupby('weeks').sum().reset_index()
+    # if idIsHistorical == False:
+    #     print('id',id,'minmax', minWeek, maxWeek,'result',result)
+    #     print('result min max', result['weeks'].min(), result['weeks'].max())
     counts = []
     upperBound = 1
+    lowerBound = int(result['weeks'].min())
     #print('result ############## \n',result)
     #print('max',result.weeks.min(), result.weeks.max())
     if not idIsHistorical:
         upperBound = int(round(result['weeks'].max(),0))
-    for week in range(result['weeks'].min(), upperBound):
+    for week in range(lowerBound, upperBound):
         if len(counts) == 0: 
             counts.append(result.loc[result['weeks'] == week, 'purchased_price'].values[0] if week in result['weeks'].values else 0)
         else:
             counts.append((result.loc[result['weeks'] == week, 'purchased_price'].values[0] + counts[-1]) if week in result['weeks'].values else counts[-1])
     
     ratios = [round(x/potentialRevenue*100,2) for x in counts]
+    #append lowerBound - minWeek number of 0s to the front of the list
+    ratios = [0]*(lowerBound-minWeek)+ratios
+    #append 0 - maxWeek number of the last elementof list to the end of the list
+    ratios = ratios + [ratios[-1]]*(maxWeek-upperBound)
+    print(ratios)
     return {'data': ratios, 'weekUpper':upperBound, 'weekLower': int(round(result['weeks'].min(),0))}
 
     #return {'data': []}
