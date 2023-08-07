@@ -7,7 +7,7 @@ export const RecommendContainer = styled.div`
 `
 
 export const RecommendWrapper = styled.div`
-  display:inline-flex;
+  display:flex;
   flex-wrap:wrap;
   height: 100vh;
   width: 100%;
@@ -15,3 +15,19 @@ export const RecommendWrapper = styled.div`
   background-color: #ed9d7e;
 `;
 
+export const RecommendHeading = styled.h1`
+  max-width: 24px;
+  margin-bottom: 48px;
+  line-height: 1.1;
+  font-weight: 600;
+  color:#202122;
+`; 
+
+export const RecommendPara1 = styled.p`
+  margin-bottom: 35px;
+  margin-top: 100px;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: bold;
+  color: #3F4041;
+`;
