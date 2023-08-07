@@ -3,7 +3,6 @@ from flask_cors import CORS
 import pandas as pd
 import scipy.stats as stats
 import numpy as np
-from math import ceil
 
 
 app = Flask(__name__)
@@ -20,10 +19,11 @@ def listHistoricalId():
 
 def listTicketType(df,id):
     if id == 'historical':
-        print('id',id,'data',df['ticket_type'].unique().tolist())
+        #print('id',id,'data',df['ticket_type'].unique().tolist())
         return df['ticket_type'].unique().tolist()
     else:
-        print('id',id,'data',df[df['ID'] == id]['ticket_type'].unique().tolist())
+        df = pd.read_csv('data/current/ticket_details_current.csv')
+        #print('id',id,'data',df[df['ID'] == id]['ticket_type'].unique().tolist())
         return df[df['ID'] == id]['ticket_type'].unique().tolist()
 
 def listCumBooking(df,id):
@@ -38,12 +38,12 @@ def listCumBooking(df,id):
     df['sail_date'] = pd.to_datetime(df['sail_date'], format='%d/%m/%Y')
     df['weeks'] = ((df['booking_date'] - df['sail_date']).dt.days / 7).astype(int)
     result = df.groupby('weeks').size().reset_index(name='count')
-    print('result',result)
+    #print('result',result)
     counts = []
     upperBound = 1
     #print('result ############## \n',result)
-    print('flag',idIsHistorical)
-    print('max',result.weeks.min(), result.weeks.max())
+    #print('flag',idIsHistorical)
+    #print('max',result.weeks.min(), result.weeks.max())
     if not idIsHistorical:
         upperBound = int(round(result['weeks'].max(),0))
 
@@ -53,7 +53,7 @@ def listCumBooking(df,id):
         else:
             counts.append((result.loc[result['weeks'] == week, 'count'].values[0] + counts[-1]) if week in result['weeks'].values else counts[-1])
     counts = [round(x/capacity*100,2) for x in counts]
-    print('counts',counts)
+    #print('counts',counts)
     return {'data': counts, 'weekUpper':upperBound, 'weekLower': int(round(result['weeks'].min(),0))}
 
 
@@ -144,8 +144,6 @@ def CMQHistorical(df,ticketType):
         if len(list) < max_length:
             lists[idx] = [0]*(max_length-len(list))+list
 
-
-
     data = np.array(lists)
     # Calculate the mean and standard error of the mean (SEM)
     sampleMean = np.mean(data, axis=0)
@@ -163,6 +161,59 @@ def CMQHistorical(df,ticketType):
     upperBound = sampleMean + margin_of_error
     upperBound[upperBound > 100] = 100
     return {'mean': sampleMean.tolist(), 'lower': lowerBound.tolist(), 'upper': upperBound.tolist()}
+
+def profileVariables(id):
+    df = pd.read_csv('data/historical/Historical_Cruises.csv')
+    if id != 'historical':
+        df = pd.read_csv('data/current/'+id+'/'+id+'.csv')
+    #df= df.dropna(axis=0, how='any')
+    df = df[df['ID'] == id].copy()
+    cols = df.columns.tolist()
+    critical_cols = ['booking_date','sail_date','ID','ticket_type','purchased_price','capacity','RRP']
+    for col in critical_cols:
+        cols.remove(col)
+    return cols
+
+#historical
+#return a list of weeks of current ships
+def ID2WeekList(id):
+    df = pd.read_csv('data/historical/Historical_Cruises.csv')
+    if id != 'historical':
+        df = pd.read_csv('data/current/'+id+'/'+id+'.csv')
+    df= df.dropna(axis=0, how='any')
+    df['booking_date'] = pd.to_datetime(df['booking_date'], format='%d/%m/%Y')
+    df['sail_date'] = pd.to_datetime(df['sail_date'], format='%d/%m/%Y')
+    df['weeks'] = ((df['booking_date'] - df['sail_date']).dt.days / 7).astype(int)
+    return df['weeks'].unique().tolist()
+
+
+def profile(id,week,variable):
+    print('input',id,week,variable) 
+    df = pd.read_csv('data/historical/Historical_Cruises.csv')
+    if id != 'historical':
+        df = pd.read_csv('data/current/'+id+'/'+id+'.csv')
+    df= df.dropna(axis=0, how='any')
+    if week != 'All':
+        df['booking_date'] = pd.to_datetime(df['booking_date'], format='%d/%m/%Y')
+        df['sail_date'] = pd.to_datetime(df['sail_date'], format='%d/%m/%Y')
+        df['weeks'] = ((df['booking_date'] - df['sail_date']).dt.days / 7).astype(int)
+        print(df['weeks'].dtype)
+        df = df[df['weeks'] == int(week)].copy()
+    dtype = df[variable].dtype
+    chartType = 'line'
+    x_values = df[variable].unique().tolist()
+    y_values = df[variable].value_counts().tolist()
+    data = [{'x': x, 'y': y} for x, y in zip(x_values, y_values)]
+    data = sorted(data, key=lambda k: k['x'])
+    #check if dataframe column is categorical or continuous
+    if dtype == 'float64' or dtype == 'int64':
+        chartType = 'line'
+    else:
+        chartType = 'bar'
+    #return a count and a list of unique values for categorical variables
+    return {'ctype': chartType,  'data':data}
+
+
 
 #chisquare test
 
@@ -215,7 +266,6 @@ def get_tickettypelist(id):
 #CMQ -historical
 @app.route('/cmq/<ticketType>', methods=['GET'])
 def get_historical_cmq(ticketType):
-    print('cmq', ticketType)
     df = pd.read_csv('data/historical/Historical_Cruises.csv')
     df.dropna(axis=0, how='any', inplace = True)
     response_data = CMQHistorical(df,ticketType)
@@ -224,13 +274,37 @@ def get_historical_cmq(ticketType):
 #CMQ with specific ship
 @app.route('/cmq/<id>/<ticketType>', methods=['GET'])
 def get_cmq_spec(id,ticketType):
-    print('cmqid', id, ticketType)
     df = pd.read_csv('data/current/'+id+'/'+id+'.csv')
     df.dropna(axis=0, how='any', inplace = True)
-    #response_data = CMQID(df,id,cabin)
-    response_data = CMQID(df,id,ticketType)
-    print(response_data)
+    dfHistory = pd.read_csv('data/historical/Historical_Cruises.csv')
+    dfHistory.dropna(axis=0, how='any', inplace = True)
+    shipData = CMQID(df,id,ticketType)
+    historicalData = CMQHistorical(dfHistory,ticketType)
+    return jsonify(data= {'cur':shipData,'his':historicalData}, message="message Success")
+
+#profile
+@app.route('/profile/<id>/<week>/<variable>', methods=['GET'])
+def get_profile(id,week,variable):
+    #print('get_profile',id,week,variable)
+    response_data = None
+    if variable != '(variable)':
+        response_data = profile(id,week,variable)
+    #print(response_data)
     return jsonify(data=response_data, message="message Success")
 
+#profileweeks
+@app.route('/profileweeks/<id>', methods=['GET'])
+def get_profile_weeks(id):
+    #print('profile weeks',id)
+    response_data = ID2WeekList(id)
+    #print(response_data)
+    return jsonify(data=response_data, message="message Success")
+
+#profile
+@app.route('/profilevariables/<id>', methods=['GET'])
+def get_profilevariables(id):
+    response_data = profileVariables(id)
+   #print('profilevariables',response_data)
+    return jsonify(data=response_data, message="message Success")
 if __name__ == '__main__':
     app.run(debug=True)

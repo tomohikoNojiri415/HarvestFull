@@ -235,13 +235,53 @@ const CMQSection = () => {
       }).then((res)=>{
         //res.data contains the data from the backend
         //manipulate data
-        var dataset = formatDataset(res.data.data, res.data.lower, res.data.upper, CMQData.labels.length);
+        const mean = res.data.his.mean;
+        const lower = res.data.his.lower;
+        const upper = res.data.his.upper;
+        var dataset = formatDataset(res.data.cur.data, res.data.cur.lower, res.data.cur.upper, CMQData.labels.length);
         setCMQData((prevData) => {
           //make the dataset as long as the historical data fill with nulls
           return {
             labels: prevData.labels,
             //keep the order so the id curve is always on top
-            datasets: [prevData.datasets[0],prevData.datasets[1], prevData.datasets[2],{
+            datasets: [
+            {
+              label: "Historical Mean",
+              type: "line",
+              backgroundColor: "rgb(75, 192, 255, 0.5)",
+              borderColor: "rgb(75, 192, 255)",
+              hoverBorderColor: "rgb(175, 192, 255)",
+              fill: false,
+              tension: 0,
+              data: mean,
+              yAxisID: 'y',
+              xAxisID: 'x'
+            },
+            {
+              label: "BandTop",
+              type: "line",
+              backgroundColor: "rgb(75, 192, 255, 0.5)",
+              borderColor: "transparent",
+              pointRadius: 0,
+              fill: 0,
+              tension: 0,
+              data: upper,
+              yAxisID: 'y',
+              xAxisID: 'x'
+            },
+            {
+              label: "BandBottom",
+              type: "line",
+              backgroundColor: "rgb(75, 192, 255, 0.5)",
+              borderColor: "transparent",
+              pointRadius: 0,
+              fill: 0,
+              tension: 0,
+              data: lower,
+              yAxisID: 'y',
+              xAxisID: 'x'
+            },
+            {
               label: `${id}`,
               type: "line",
               backgroundColor: "rgb(255,97,36, 0.5)",
@@ -252,7 +292,8 @@ const CMQSection = () => {
               data: dataset,
               yAxisID: 'y',
               xAxisID: 'x'
-            }],
+            },
+            ],
           }
         });
       }).catch(err => {
@@ -279,14 +320,7 @@ const CMQSection = () => {
           <CMQColumn1>
           <CMQContentWrapper>
               <CMQHeading> Class Mix Quality</CMQHeading>
-              <CMQPara1> Class Mix Quality (CMQ) is a CHEP specific 
-                metric created to determine the standardised ROI for an 
-                event.If all tickets, across all ticket levels were sold 
-                at full price then the CMQ = 1. If discounted tickets were
-                 sold or the event was not fully booked then the CMQ will 
-                 fall between 0 and 1. CMQ gives us an understanding of how 
-                 profitable an event will be and indicates any profitability
-                   concerns far enough in advance to mitigate them.
+              <CMQPara1> Maximising the yield
                 </CMQPara1>
               <select onChange={(event)=> {setCMQId(event.target.value)}}>
                 {CMQIdList.map((id, index) => (
@@ -302,11 +336,21 @@ const CMQSection = () => {
                   </option>
                 ))}
               </select>
-              <CMQPara2>  CMQ is can be improved by either:
+              <CMQPara2>  Class Mix Quality (CMQ) is a CHEP metric created to represent 
+                sales as a function of potential. With this metric we can optimise each 
+                event. It is not an ability to discount, it is the capability to sell to
+                 a customer based on what they are willing to pay.<br /><br />
+ 
+                The calculation is built from a combination of the number of tickets available 
+                and the price of those tickets. If every ticket is sold for the most expensive 
+                ticket price, then our CMQ would equal 1. Conversely, if a ship sails without 
+                a ticket being sold, the CMQ would be 0.<br /><br />
+
+                By tracking the cumulative CMQ we can improve overall yield by recognising that we can sell:
                 <CMQList>
-                  <li>Selling more tickets</li>
-                  <li>Selling tickets at higher prices</li>
-                  <li>Selling more tickets at higher prices</li>
+                  <li>More tickets,</li>
+                  <li>Higher priced tickets or,</li>
+                  <li>More tickets at the higher price points.</li>
                 </CMQList>
               </CMQPara2>
             </CMQContentWrapper>
