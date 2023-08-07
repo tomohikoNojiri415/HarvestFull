@@ -53,6 +53,7 @@ export const CMQPara1 = styled.p`
   margin-bottom: 35px;
   font-size: 16px;
   line-height: 22px;
+  font-weight: bold;
   color: #3F4041;
 `;
 
@@ -61,7 +62,8 @@ export const CMQPara2 = styled.p`
   margin-bottom: 20px;
   font-size: 16px;
   line-height: 22px;
-  color: #848585;
+  color: #3F4041;
+  //color: #848585;
 `;
 
 export const CMQList = styled.ul`

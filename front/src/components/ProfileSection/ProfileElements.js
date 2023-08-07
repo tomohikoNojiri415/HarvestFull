@@ -52,6 +52,7 @@ export const ProfileHeading = styled.h1`
 export const ProfilePara1 = styled.p`
   margin-bottom: 35px;
   font-size: 16px;
+  font-weight: bold;
   line-height: 22px;
   color: #3F4041;
 `;
@@ -61,7 +62,7 @@ export const ProfilePara2 = styled.p`
   margin-bottom: 20px;
   font-size: 16px;
   line-height: 22px;
-  color: #848585;
+  color: #3F4041;
 `;
 
 export const ProfileChartWrapper = styled.div`

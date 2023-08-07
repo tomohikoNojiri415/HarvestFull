@@ -97,7 +97,7 @@ const BookingCurveSection = () => {
   }
 
   //fetching a list of ids
-  //the resulting list has a 0 at the start when page load !!reserve 0 for no ship selected
+  //the resulting list has a 0 at the start when page load
   const fetchIds = () => {
     fetch('http://127.0.0.1:5000/idlist',{
       method: 'GET',
@@ -134,7 +134,6 @@ const BookingCurveSection = () => {
         const res=data.json();
         return res;
       }).then((res)=>{
-        console.log('historical data', res.data);
         const mean = res.data.mean;
         const lower = res.data.lower;
         const upper = res.data.upper;
@@ -201,7 +200,6 @@ const BookingCurveSection = () => {
         const res=data.json();
         return res;
       }).then((res)=>{
-        console.log('id data', res.data);
         //res.data contains the data from the backend
         //manipulate data
         var dataset = formatDataset(res.data.data, res.data.lower, res.data.upper, bookingData.labels.length);
@@ -249,11 +247,7 @@ const BookingCurveSection = () => {
           <BookingColumn1>
           <BookingContentWrapper>
               <BookingHeading> Accumulative Booking Curve</BookingHeading>
-              <BookingPara1> Every event follows a similar pattern when it comes to bookings. While nuances exi
-                st among specific events there is a general pattern of behaviour that consumers follow.
-                As a result, at any time prior to the event occurring there is an opportunity to recognise 
-                whether or not ticket sales are ahead or behind forecast. This knowledge creates a starting 
-                point for determining what actions needs to be taken.</BookingPara1>
+              <BookingPara1>Every booking follows a similar pattern.</BookingPara1>
               <select onChange={(event)=> {setBookingId((prevData) =>{
                 return event.target.value}
               )}}>
@@ -263,12 +257,15 @@ const BookingCurveSection = () => {
                   </option>
                 ))}
               </select>
-              <BookingPara2> Use the booking curve to the right to understand whether or not your current sales for 
-                the event of your choice is within the range of expected sales to date. If the current sales
-                 are tracking below expected, you can use the customer segmentation tab below to identify prof
-                 iles of consumers likely to purchase at this time and aid in your marketing efforts. Similarly
-                  if sales are ahead of expected, customer profiles can identify whether the characteristics of 
-                  customers for this event in question differs from expected or if volume is simply higher.</BookingPara2>
+              <BookingPara2>While nuances exist among specific events there is a general 
+                pattern of behaviour that consumers follow.<br /><br /> 
+                As a result, at any time prior to the event occurring there is an opportunity
+                 to recognise whether or not ticket sales are ahead or behind forecast. This 
+                 knowledge creates a starting point for determining what actions needs to be taken.
+                <br /><br />
+                Use the booking curve to the right to understand whether or not your current sales 
+                for the event of your choice is within the range of expected sales to date.
+                </BookingPara2>
             </BookingContentWrapper>
           </BookingColumn1>
           <BookingColumn2>

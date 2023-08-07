@@ -1,4 +1,4 @@
-import {Line} from 'react-chartjs-2';
+import {Bar} from 'react-chartjs-2';
 import React, {useEffect, useState} from 'react';
 import{
   Chart as ChartJS,
@@ -10,7 +10,6 @@ import{
   Title,
   Tooltip,
   Legend,
-  Filler,
 } from 'chart.js';
 
 import {
@@ -30,69 +29,226 @@ ChartJS.register(
   LinearScale,
   LineElement,
   BarElement,
-  Filler,
   Title,
   Tooltip,
   Legend,
   PointElement)
 
-var ProfileOptions = {
-  indexAxis: 'x',
-  maintainAspectRatio: false,
-  elements: {
-    bar: {
-      borderWidth: 2,
+
+  var profileOptions = {
+    indexAxis: 'x',
+    maintainAspectRatio: false,
+    elements: {
+      bar: {
+        borderWidth: 2,
+      },
     },
-  },
-  scales: {
-    y: {
-      title: {
-        display: true,
-        text: 'Number of Profiles (Percent)',
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Count',
+        }
+      },
+      x: {
+        title: {
+          display: false,
+        }
       }
     },
-    x: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom',
+      },
       title: {
         display: true,
-        text: 'Weeks before Departure',
-      }
-    }
-  },
-  responsive: true,
-  plugins: {
-    legend: {
-      position: 'bottom',
+        text: 'Customer Profile',
+      },
     },
-    title: {
-      display: true,
-      text: 'Profile Curve',
-    },
-  },
-};
+  };
 
 const ProfileSection = () => {
+  
+  //https://blog.bitsrc.io/customizing-chart-js-in-react-2199fa81530a
+  const [profileId, setProfileId] = useState('historical');
+  const [profileIdList, setProfileIdList] = useState(['historical']);
+  const [profileWeek, setProfileWeek] = useState('All');
+  const [profileWeeksList, setProfileWeeksList] = useState(['All']);
+  const [profileVariable, setProfileVariable] = useState('(variable)');
+  const [profileVariablesList, setProfileVariablesList] = useState(['(varible)']);
+  const [profileData, setProfileData] = useState({
+    labels: [0],
+    datasets: [
+      {
+        label:'(variable)',
+        data: [0],
+        backgroundColor: "rgb(75, 192, 255, 0.5)",
+        borderColor: "rgb(75, 192, 255)",
+        hoverBorderColor: "rgb(175, 192, 255)",
+      },
+    ],
+  });
 
+    //the resulting list has a 0 at the start when page load
+  const fetchIds = () => {
+    fetch('http://127.0.0.1:5000/idlist',{
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(data => {
+      //decode message
+      const res=data.json();
+      return res;
+    }).then((res)=>{
+      setProfileIdList(['historical'].concat(res.data));
+     }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  const fetchWeeks = (id) => {
+    fetch(`http://127.0.0.1:5000/profileweeks/${id}`,{
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(data => {
+      //decode message
+      const res=data.json();
+      return res;
+    }).then((res)=>{
+      //console.log('TicketTypedata', res.data);
+      setProfileWeeksList(['All'].concat(res.data));
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  const fetchVariables = (id) => {
+    fetch(`http://127.0.0.1:5000/profilevariables/${id}`,{
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(data => {
+      //decode message
+      const res=data.json();
+      return res;
+    }).then((res)=>{
+      //console.log('TicketTypedata', res.data);
+      setProfileVariablesList(res.data);
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  const fetchData = (id,week,variable) => {
+    if (variable === '(variable)') {
+      profileOptions.plugins.title.text = `Customer Profile`;
+    } else {
+      profileOptions.plugins.title.text = `Customer ${profileVariable}`;
+    }
+    fetch(`http://127.0.0.1:5000/profile/${id}/${week}/${variable}`,{
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(data => {
+      //decode message
+      const res=data.json();
+      return res;
+    }).then((res)=>{
+      console.log(res);
+      const lbl = res.data.data.map(dataPoint => dataPoint.x);
+      console.log(res.data.ctype);
+      setProfileData({
+        labels: lbl,
+        datasets: [
+          // {
+          //   label:'Historical CMQs',
+          //   data: mean,
+          //   borderColor: 'rgba(75, 192, 192, 1)',
+          //   backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          // },
+          {
+            label: `${variable}`,
+            type: res.data.ctype,
+            backgroundColor: "rgb(75, 192, 255, 0.5)",
+            borderColor: "rgb(75, 192, 255)",
+            hoverBorderColor: "rgb(175, 192, 255)",
+            fill: false,
+            tension: 0,
+            data: res.data.data,
+            yAxisID: 'y',
+            xAxisID: 'x'
+          },
+        ],
+      });
+    }).catch(err => {
+      console.log(err);
+    });
+  };
+  
+  useEffect(() => {
+    fetchWeeks(profileId);
+    fetchVariables(profileId);
+    fetchData(profileId, profileWeek,profileVariable);
+  }, [profileId,profileWeek,profileVariable]);
+  
+
+  useEffect(()=>{
+    fetchIds();
+  },[])  
   return (
     <>
       <ProfileContainer id='clientsegmentation'>
         <ProfileWrapper>
           <ProfileColumn2>
             <ProfileChartWrapper>
+              <Bar data={profileData} options={profileOptions} />
             </ProfileChartWrapper>
           </ProfileColumn2>
           <ProfileColumn1>
           <ProfileContentWrapper>
-              <ProfileHeading> Client Segmentation</ProfileHeading>
-              <ProfilePara1> Class Mix Quality (Profile) is a CHEP specific 
-                metric created to determine the standardised ROI for an 
-                event.If all tickets, across all ticket levels were sold 
-                at full price then the Profile = 1. If discounted tickets were
-                 sold or the event was not fully booked then the Profile will 
-                 fall between 0 and 1. Profile gives us an understanding of how 
-                 profitable an event will be and indicates any profitability
-                   concerns far enough in advance to mitigate them.
+              <ProfileHeading> Spirited Travellers</ProfileHeading>
+              <ProfilePara1> The customer segmentation identifies the profiles of 
+                consumers most likely to purchase at the specific times.
                 </ProfilePara1>
-              <ProfilePara2>  Profile is can be improved by either:
+                <select onChange={(event)=> {setProfileId(event.target.value)}}>
+                {profileIdList.map((id, index) => (
+                  <option key={index} value={id}>
+                    {id}
+                  </option>
+                ))}
+                </select>
+                <select onChange={(event)=> {setProfileWeek(event.target.value)}}>
+                {profileWeeksList.map((profileWeek, index) => (
+                  <option key={index} value={profileWeek}>
+                    {profileWeek}
+                  </option>
+                ))}
+              </select>
+              <select onChange={(event)=> {setProfileVariable(event.target.value)}}>
+                {profileVariablesList.map((profileVariable, index) => (
+                  <option key={index} value={profileVariable}>
+                    {profileVariable}
+                  </option>
+                ))}
+              </select>
+              <ProfilePara2>  
+                If you are
+                pacing behind forecast, these profiles will assist you in identifying 
+                the characteristics of customers most relevant to talk to at this moment 
+                in time. <br /> <br />If you are ahead of forecast, then it might be worth 
+                considering repurposing the media for audiences you would be 
+                buying against.
               </ProfilePara2>
             </ProfileContentWrapper>
           </ProfileColumn1>

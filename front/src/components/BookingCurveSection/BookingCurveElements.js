@@ -52,6 +52,7 @@ export const BookingHeading = styled.h1`
 export const BookingPara1 = styled.p`
   margin-bottom: 35px;
   font-size: 16px;
+  font-weight: bold;
   line-height: 22px;
   color: #3F4041;
 `;
@@ -61,7 +62,7 @@ export const BookingPara2 = styled.p`
   margin-bottom: 20px;
   font-size: 16px;
   line-height: 22px;
-  color: #848585;
+  color: #3F4041;
 `;
 
 export const BookingChartWrapper = styled.div`
