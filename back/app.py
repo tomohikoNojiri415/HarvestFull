@@ -28,10 +28,12 @@ def listTicketType(df,id):
 
 def listCumBooking(df,id):
     dfIn= pd.read_csv('data/historical/ticket_details_historical.csv')
+    #print(dfIn['ID'].unique().tolist())
     idIsHistorical = True
     if id not in dfIn['ID'].unique().tolist():
         idIsHistorical = False
         df= pd.read_csv('data/current/'+id+'/'+id+'.csv')
+    #print(id,'idIsHistorical',idIsHistorical)
     df = df[df['ID'] == id].copy()
     capacity = df['capacity'].values[0]
     df['booking_date'] = pd.to_datetime(df['booking_date'], format='%d/%m/%Y')
@@ -88,28 +90,32 @@ def listHistoricalBooking(df):
     return {'mean': sampleMean.tolist(), 'lower': lowerBound.tolist(), 'upper': upperBound.tolist()}
 
 #generate CMQ score for specifc id
-def CMQID(df, id, ticketType):
+def CMQID(id, ticketType):
     #read ticket details depending if historical or current
     dfIn= pd.read_csv('data/historical/ticket_details_historical.csv')
+    df = pd.read_csv('data/historical/Historical_Cruises.csv')
     idIsHistorical = True
     if id not in dfIn['ID'].unique().tolist():
         idIsHistorical = False
         dfIn = pd.read_csv('data/current/ticket_details_current.csv')
+        df = pd.read_csv('data/current/'+id+'/'+id+'.csv')
     dfIn = dfIn[dfIn['ID'] == id].copy()
     if ticketType != 'All':
         dfIn = dfIn[dfIn['ticket_type'] == ticketType].copy()
     potentialRevenue = (dfIn['tickets_available'] * dfIn['RRP']).sum()
     #print('potentialRevenue',potentialRevenue)
 
+    #df = pd.read_csv('data/current/'+id+'/'+id+'.csv')
     #df2 = df[df['ID'] == id & df['ticketType'] == ticketType].copy()
-    df2 = df[df['ID'] == id].copy()
     #print("############ df2 ########### \n",df2)
-    df2['booking_date'] = pd.to_datetime(df2['booking_date'], format='%d/%m/%Y')
-    df2['sail_date'] = pd.to_datetime(df2['sail_date'], format='%d/%m/%Y')
+    df['booking_date'] = pd.to_datetime(df['booking_date'], format='%d/%m/%Y')
+    df['sail_date'] = pd.to_datetime(df['sail_date'], format='%d/%m/%Y')
     #ceil round number closer to 0 i.e -9.8 -> -9
-    df2['weeks'] = ((df2['booking_date'] - df2['sail_date']).dt.days / 7).astype(int)
-    minWeek = df2['weeks'].min()
-    maxWeek = df2['weeks'].max()
+    df['weeks'] = ((df['booking_date'] - df['sail_date']).dt.days / 7).astype(int)
+    minWeek = df['weeks'].min()
+    maxWeek = df['weeks'].max()
+    df2 = df[df['ID'] == id].copy()
+    print('minmax',minWeek, maxWeek)
     #print('weeks',df2['weeks'])
     if ticketType != 'All':
         df2 = df2[df2['ticket_type'] == ticketType].copy()
@@ -119,11 +125,13 @@ def CMQID(df, id, ticketType):
     #     print('result min max', result['weeks'].min(), result['weeks'].max())
     counts = []
     upperBound = 1
-    lowerBound = int(result['weeks'].min())
+    lowerBound = minWeek
+    #lowerBound = int(result['weeks'].min())
     #print('result ############## \n',result)
     #print('max',result.weeks.min(), result.weeks.max())
     if not idIsHistorical:
-        upperBound = int(round(result['weeks'].max(),0))
+        upperBound = int(result['weeks'].max())
+    print('upperBound',upperBound,'lowerBound',lowerBound)
     for week in range(lowerBound, upperBound):
         if len(counts) == 0: 
             counts.append(result.loc[result['weeks'] == week, 'purchased_price'].values[0] if week in result['weeks'].values else 0)
@@ -135,8 +143,8 @@ def CMQID(df, id, ticketType):
     ratios = [0]*(lowerBound-minWeek)+ratios
     #append 0 - maxWeek number of the last elementof list to the end of the list
     ratios = ratios + [ratios[-1]]*(maxWeek-upperBound)
-    print(ratios)
-    return {'data': ratios, 'weekUpper':upperBound, 'weekLower': int(round(result['weeks'].min(),0))}
+    print('ratios',ratios,len(ratios))
+    return {'data': ratios, 'weekUpper':upperBound -1, 'weekLower': int(round(result['weeks'].min(),0))}
 
     #return {'data': []}
 
@@ -144,17 +152,21 @@ def CMQHistorical(df,ticketType):
     if ticketType != 'All':
         df = df[df['ticket_type'] == ticketType].copy()
     lists = []
-    max_length = 0
+    minLower = 1
+    maxUpper = -999
     for id in df['ID'].unique().tolist():
-        lists.append(CMQID(df,id, ticketType).get('data'))
-        if len(lists[-1]) > max_length:
-            max_length = len(lists[-1])
+        res = CMQID(id,ticketType)
+        lists.append(res)
+        if res.get('weekLower') < minLower:
+            minLower = res.get('weekLower')
+        if res.get('weekUpper') > maxUpper:
+            maxUpper = res.get('weekUpper')
 
-    for idx, list in enumerate(lists):
-        if len(list) < max_length:
-            lists[idx] = [0]*(max_length-len(list))+list
-
-    data = np.array(lists)
+    result_list = []
+    maxLen = -1
+    for list in lists:
+        result_list.append(list.get('data'))
+    data = np.array(result_list)
     # Calculate the mean and standard error of the mean (SEM)
     sampleMean = np.mean(data, axis=0)
     SE = stats.sem(data, axis=0)
@@ -198,7 +210,7 @@ def ID2WeekList(id):
 
 
 def profile(id,week,variable):
-    print('input',id,week,variable) 
+    #print('input',id,week,variable) 
     df = pd.read_csv('data/historical/Historical_Cruises.csv')
     if id != 'historical':
         df = pd.read_csv('data/current/'+id+'/'+id+'.csv')
@@ -207,7 +219,6 @@ def profile(id,week,variable):
         df['booking_date'] = pd.to_datetime(df['booking_date'], format='%d/%m/%Y')
         df['sail_date'] = pd.to_datetime(df['sail_date'], format='%d/%m/%Y')
         df['weeks'] = ((df['booking_date'] - df['sail_date']).dt.days / 7).astype(int)
-        print(df['weeks'].dtype)
         df = df[df['weeks'] == int(week)].copy()
     dtype = df[variable].dtype
     chartType = 'line'
@@ -284,12 +295,11 @@ def get_historical_cmq(ticketType):
 #CMQ with specific ship
 @app.route('/cmq/<id>/<ticketType>', methods=['GET'])
 def get_cmq_spec(id,ticketType):
-    df = pd.read_csv('data/current/'+id+'/'+id+'.csv')
-    df.dropna(axis=0, how='any', inplace = True)
     dfHistory = pd.read_csv('data/historical/Historical_Cruises.csv')
     dfHistory.dropna(axis=0, how='any', inplace = True)
-    shipData = CMQID(df,id,ticketType)
+    shipData = CMQID(id,ticketType)
     historicalData = CMQHistorical(dfHistory,ticketType)
+    print('history length', len(historicalData.get('mean')))
     return jsonify(data= {'cur':shipData,'his':historicalData}, message="message Success")
 
 #profile
