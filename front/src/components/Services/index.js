@@ -1,7 +1,7 @@
 import React from 'react'
-import Icon1 from '../../images/svg3.svg'
-import Icon2 from '../../images/svg4.svg'
-import Icon3 from '../../images/svg6.svg'
+import Icon1 from '../../images/ST1.svg'
+import Icon2 from '../../images/ST2.svg'
+import Icon3 from '../../images/ST3.svg'
 import {
   ServicesContainer,
   ServicesWrapper,
@@ -27,7 +27,7 @@ const Services = () => {
         </ServicesCard>
         <ServicesCard to='clientsegmentation'>
           <ServicesIcon src={Icon2} />
-          <ServicesH2>Client Segmentation</ServicesH2>
+          <ServicesH2>Spirited Travellers</ServicesH2>
           <ServicesP>Examine the patterns between consumer characteristics and booking habits to build customer profiles.</ServicesP>
         </ServicesCard>
         <ServicesCard to='cmq'>

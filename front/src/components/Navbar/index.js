@@ -46,7 +46,7 @@ const Navbar = ({ toggle }) => {
               spy={true}
               exact='true'
               offset={-80}
-              >Client Segmentation</NavLinks>
+              >Spirited Travellers</NavLinks>
             </NavItem>
             <NavItem>
               <NavLinks 

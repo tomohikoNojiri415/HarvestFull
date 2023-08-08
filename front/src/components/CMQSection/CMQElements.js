@@ -45,15 +45,16 @@ export const CMQHeading = styled.h1`
   max-width: 24px;
   margin-bottom: 48px;
   line-height: 1.1;
-  font-weight: 600;
-  color:#202122;
+  font-weight: 900;
+  color:#012169;
+  font-family: 'Gothic821';
 `; 
 
 export const CMQPara1 = styled.p`
   margin-bottom: 35px;
   font-size: 16px;
   line-height: 22px;
-  font-weight: bold;
+  font-weight: 900;
   color: #3F4041;
 `;
 
@@ -64,6 +65,7 @@ export const CMQPara2 = styled.p`
   line-height: 22px;
   color: #3F4041;
   //color: #848585;
+  font-weight: 500;
 `;
 
 export const CMQList = styled.ul`

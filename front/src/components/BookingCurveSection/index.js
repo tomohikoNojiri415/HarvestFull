@@ -147,8 +147,8 @@ const BookingCurveSection = () => {
             {
               label: "Historical Mean",
               type: "line",
-              backgroundColor: "rgb(75, 192, 255, 0.5)",
-              borderColor: "rgb(75, 192, 255)",
+              backgroundColor: "rgb(1,3,105, 0.5)",
+              borderColor: "rgb(1,3,105)",
               hoverBorderColor: "rgb(175, 192, 255)",
               fill: false,
               tension: 0,
@@ -212,9 +212,9 @@ const BookingCurveSection = () => {
             datasets: [prevData.datasets[0],prevData.datasets[1], prevData.datasets[2],{
               label: `${id}`,
               type: "line",
-              backgroundColor: "rgb(255,97,36, 0.5)",
-              borderColor: "rgba(255,97,36, 1)",
-              hoverBorderColor: "rgb(255,97,36)",
+              backgroundColor: "rgb(200, 16, 46, 0.5)",
+              borderColor: "rgba(200, 16, 46, 1)",
+              hoverBorderColor: "rgb(200, 16, 46)",
               fill: false,
               tension: 0,
               data: dataset,

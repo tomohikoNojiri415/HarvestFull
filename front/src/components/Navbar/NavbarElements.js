@@ -4,15 +4,15 @@ import { Link as LinkS } from 'react-scroll'
 
 
 export const Nav = styled.nav`
-  background: #FF6124;
+  //background: #FF6124;
+  background: #c8102e;
   height: 80px;
   // margin-top: -80px; /* This is to offset the height of the navbar */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 10; /* This is to make sure the navbar is on top of everything else */
-  position: sticky
-   ; /* This is to make sure the navbar is always on top */
+  position: sticky; /* This is to make sure the navbar is always on top */
   top: 0; /* This is to make sure the navbar is always on top */
   @media screen and (max-width: 960px) {
     transition: 0,8s all ease;
@@ -28,7 +28,7 @@ export const NavbarContainer = styled.div`
   max-width: 1100px;
 `
 export const NavLogo = styled(LinkS)`
-  color: #010606;
+  color: #fff;
   //color: #ed9d7e;
   justify-self: flex-start; /* This is to make sure the logo is on the left side */
   cursor: pointer;
@@ -38,6 +38,7 @@ export const NavLogo = styled(LinkS)`
   margin-left: 24px;
   font-weight: bold;
   text-decoration: none;
+  font-family: 'Gothic821';
 `
 
 export const MobileIcon = styled.div`
@@ -71,7 +72,7 @@ export const NavItem = styled.li`
 `
 
 export const NavLinks = styled(LinkS)`
-  color: #010606;
+  color: #fff;
   display: flex;
   align-items: center; 
   text-decoration: none;
@@ -95,10 +96,11 @@ export const NavBtn = styled.nav`
 `
 export const NavBtnLink = styled(LinkR)`
   border-radius: 50px;
-  background: #ed9d7e;
+  //background: #ed9d7e;
+  background: #012169;
   white-space: nowrap;
   padding: 10px 22px;
-  color: #010606;
+  color: #fff;
   font-size: 16px;
   outline: none;
   border: none;

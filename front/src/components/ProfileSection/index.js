@@ -84,8 +84,8 @@ const ProfileSection = () => {
       {
         label:'(variable)',
         data: [0],
-        backgroundColor: "rgb(75, 192, 255, 0.5)",
-        borderColor: "rgb(75, 192, 255)",
+        backgroundColor: "rgb(1,33,105, 0.5)",
+        borderColor: "rgb(1,33,105)",
         hoverBorderColor: "rgb(175, 192, 255)",
       },
     ],
@@ -180,8 +180,8 @@ const ProfileSection = () => {
           {
             label: `${variable}`,
             type: res.data.ctype,
-            backgroundColor: "rgb(75, 192, 255, 0.5)",
-            borderColor: "rgb(75, 192, 255)",
+            backgroundColor: "rgb(1,33,105, 0.5)",
+            borderColor: "rgb(1,33,105)",
             hoverBorderColor: "rgb(175, 192, 255)",
             fill: false,
             tension: 0,

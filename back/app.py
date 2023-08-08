@@ -105,6 +105,7 @@ def CMQID(id, ticketType):
     potentialRevenue = (dfIn['tickets_available'] * dfIn['RRP']).sum()
     #print('potentialRevenue',potentialRevenue)
 
+    df = df.dropna(axis=0, how='any')
     #df = pd.read_csv('data/current/'+id+'/'+id+'.csv')
     #df2 = df[df['ID'] == id & df['ticketType'] == ticketType].copy()
     #print("############ df2 ########### \n",df2)
@@ -115,7 +116,6 @@ def CMQID(id, ticketType):
     minWeek = df['weeks'].min()
     maxWeek = df['weeks'].max()
     df2 = df[df['ID'] == id].copy()
-    print('minmax',minWeek, maxWeek)
     #print('weeks',df2['weeks'])
     if ticketType != 'All':
         df2 = df2[df2['ticket_type'] == ticketType].copy()
@@ -131,7 +131,6 @@ def CMQID(id, ticketType):
     #print('max',result.weeks.min(), result.weeks.max())
     if not idIsHistorical:
         upperBound = int(result['weeks'].max())
-    print('upperBound',upperBound,'lowerBound',lowerBound)
     for week in range(lowerBound, upperBound):
         if len(counts) == 0: 
             counts.append(result.loc[result['weeks'] == week, 'purchased_price'].values[0] if week in result['weeks'].values else 0)
@@ -143,7 +142,6 @@ def CMQID(id, ticketType):
     ratios = [0]*(lowerBound-minWeek)+ratios
     #append 0 - maxWeek number of the last elementof list to the end of the list
     ratios = ratios + [ratios[-1]]*(maxWeek-upperBound)
-    print('ratios',ratios,len(ratios))
     return {'data': ratios, 'weekUpper':upperBound -1, 'weekLower': int(round(result['weeks'].min(),0))}
 
     #return {'data': []}

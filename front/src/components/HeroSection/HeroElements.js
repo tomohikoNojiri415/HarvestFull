@@ -29,6 +29,7 @@ export const HeroBg = styled.div`
   width: 100%;
   height: 100%;
   overflow: hidden;
+  
 `;
 
 export const VideoBg = styled.video`
@@ -48,13 +49,16 @@ export const HeroContent = styled.div`
   flex-direction: column;
   align-items: center;
  // background-color:red;
-  //backdrop-filter: blur(10px);
+  //backdrop-filter: blur(20px);
 `;
 
 export const HeroH1 = styled.h1`
-  color: #FF6124;
+  color: #C8102E;
   font-size: 48px;
   text-align: center;
+  font-family: 'Gothic821';
+  font-weight: 900;
+  
 
   @media screen and (max-width: 768px){
     font-size: 40px;
@@ -67,10 +71,12 @@ export const HeroH1 = styled.h1`
 
 export const HeroP = styled.p`
   margin-top: 24px;
-  color: #fff;
+  //color: #010606;
+  color: #010606;
   font-size: 24px;
   text-align: center;
   max-width: 600px;
+  font-weight: 500;
 
   @media screen and (max-width: 768px){
     font-size: 24px;

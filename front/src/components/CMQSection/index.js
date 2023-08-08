@@ -181,8 +181,8 @@ const CMQSection = () => {
             {
               label: "Historical Mean",
               type: "line",
-              backgroundColor: "rgb(75, 192, 255, 0.5)",
-              borderColor: "rgb(75, 192, 255)",
+              backgroundColor: "rgb(1,33,105, 0.5)",
+              borderColor: "rgb(1,33,105)",
               hoverBorderColor: "rgb(175, 192, 255)",
               fill: false,
               tension: 0,
@@ -248,8 +248,8 @@ const CMQSection = () => {
             {
               label: "Historical Mean",
               type: "line",
-              backgroundColor: "rgb(75, 192, 255, 0.5)",
-              borderColor: "rgb(75, 192, 255)",
+              backgroundColor: "rgb(1,33,105, 0.5)",
+              borderColor: "rgb(1,33,105)",
               hoverBorderColor: "rgb(175, 192, 255)",
               fill: false,
               tension: 0,
@@ -284,8 +284,8 @@ const CMQSection = () => {
             {
               label: `${id}`,
               type: "line",
-              backgroundColor: "rgb(255,97,36, 0.5)",
-              borderColor: "rgba(255,97,36, 1)",
+              backgroundColor: "rgb(200,16,46, 0.5)",
+              borderColor: "rgba(200,16,46, 1)",
               hoverBorderColor: "rgb(255,97,36)",
               fill: false,
               tension: 0,
