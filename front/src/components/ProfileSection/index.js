@@ -69,8 +69,21 @@ ChartJS.register(
     },
   };
 
+const fetchData = async (url) => {
+  const response = await fetch(url,{ method: 'GET', mode: 'cors', headers: { "Content-Type": "application/json",},});
+  const data = await response.json();
+  return data;
+}
+
+const setTitle = (variable) => {
+  if (variable === '(variable)') {
+    profileOptions.plugins.title.text = `Customer Profile`;
+  } else {
+    profileOptions.plugins.title.text = `Customer ${variable}`;
+  }
+}
+
 const ProfileSection = () => {
-  
   //https://blog.bitsrc.io/customizing-chart-js-in-react-2199fa81530a
   const [profileId, setProfileId] = useState('historical');
   const [profileIdList, setProfileIdList] = useState(['historical']);
@@ -93,90 +106,32 @@ const ProfileSection = () => {
 
     //the resulting list has a 0 at the start when page load
   const fetchIds = () => {
-    fetch('http://127.0.0.1:5000/idlist',{
-      method: 'GET',
-      mode: 'cors',
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(data => {
-      //decode message
-      const res=data.json();
-      return res;
-    }).then((res)=>{
+    console.log('fetchIds');
+    fetchData('http://127.0.0.1:5000/idlist').then((res)=>{
       setProfileIdList(['historical'].concat(res.data));
-     }).catch(err => {
-      console.log(err);
-    })
+     })
   }
 
   const fetchWeeks = (id) => {
-    fetch(`http://127.0.0.1:5000/profileweeks/${id}`,{
-      method: 'GET',
-      mode: 'cors',
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(data => {
-      //decode message
-      const res=data.json();
-      return res;
-    }).then((res)=>{
-      //console.log('TicketTypedata', res.data);
+    console.log('fetchWeeks',id);
+    fetchData(`http://127.0.0.1:5000/profileweeks/${id}`).then((res)=>{
       setProfileWeeksList(['All'].concat(res.data));
-    }).catch(err => {
-      console.log(err);
     })
   }
 
   const fetchVariables = (id) => {
-    fetch(`http://127.0.0.1:5000/profilevariables/${id}`,{
-      method: 'GET',
-      mode: 'cors',
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(data => {
-      //decode message
-      const res=data.json();
-      return res;
-    }).then((res)=>{
-      //console.log('TicketTypedata', res.data);
-      setProfileVariablesList(res.data);
-    }).catch(err => {
-      console.log(err);
+    fetchData(`http://127.0.0.1:5000/profilevariables/${id}`).then((res)=>{
+      setProfileVariablesList(['(variable)'].concat(res.data));
     })
   }
 
-  const fetchData = (id,week,variable) => {
-    if (variable === '(variable)') {
-      profileOptions.plugins.title.text = `Customer Profile`;
-    } else {
-      profileOptions.plugins.title.text = `Customer ${profileVariable}`;
-    }
-    fetch(`http://127.0.0.1:5000/profile/${id}/${week}/${variable}`,{
-      method: 'GET',
-      mode: 'cors',
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(data => {
-      //decode message
-      const res=data.json();
-      return res;
-    }).then((res)=>{
-      console.log(res);
+  const fetchIdData = (id,week,variable) => {
+    setTitle(variable);
+    fetchData(`http://127.0.0.1:5000/profile/${id}/${week}/${variable}`).then((res)=>{
       const lbl = res.data.data.map(dataPoint => dataPoint.x);
-      console.log(res.data.ctype);
       setProfileData({
         labels: lbl,
         datasets: [
-          // {
-          //   label:'Historical CMQs',
-          //   data: mean,
-          //   borderColor: 'rgba(75, 192, 192, 1)',
-          //   backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          // },
           {
             label: `${variable}`,
             type: res.data.ctype,
@@ -195,17 +150,16 @@ const ProfileSection = () => {
       console.log(err);
     });
   };
-  
-  useEffect(() => {
-    fetchWeeks(profileId);
-    fetchVariables(profileId);
-    fetchData(profileId, profileWeek,profileVariable);
-  }, [profileId,profileWeek,profileVariable]);
-  
-
   useEffect(()=>{
     fetchIds();
   },[])  
+
+  useEffect(() => {
+    fetchWeeks(profileId);
+    fetchVariables(profileId);
+    fetchIdData(profileId, profileWeek,profileVariable);
+  }, [profileId,profileWeek,profileVariable]);
+  
   return (
     <>
       <ProfileContainer id='clientsegmentation'>
@@ -222,7 +176,7 @@ const ProfileSection = () => {
                 consumers most likely to purchase at the specific times.
                 </ProfilePara1>
                 <select onChange={(event)=> {setProfileId(event.target.value)}}>
-                {profileIdList.map((id, index) => (
+                {profileIdList && profileIdList.map((id, index) => (
                   <option key={index} value={id}>
                     {id}
                   </option>
@@ -236,9 +190,9 @@ const ProfileSection = () => {
                 ))}
               </select>
               <select onChange={(event)=> {setProfileVariable(event.target.value)}}>
-                {profileVariablesList.map((profileVariable, index) => (
-                  <option key={index} value={profileVariable}>
-                    {profileVariable}
+                {profileVariablesList.map((varp, index) => (
+                  <option key={index} value={varp}>
+                    {varp}
                   </option>
                 ))}
               </select>

@@ -9,10 +9,9 @@ import {
   SideBtnWrap,
   SidebarRoute
 } from './SidebarElements'
-const Sidebar = ({isOpen, toggle}) => {
-  console.log(isOpen);
+const Sidebar = ({toggle}) => {
   return (
-    <SidebarContainer isOpen={isOpen} onClick={toggle}>
+    <SidebarContainer onClick={toggle}>
       <Icon onClick ={toggle}>
         <CloseIcon />
       </Icon>

@@ -1,4 +1,4 @@
-day,flag,ID,sail_date,booking_date, Age ,state,gender,returning_cust,ticket_type,RRP,discount,purchased_price,capacity
+day,flag,ID,sail_date,booking_date,Age,state,gender,returning_cust,ticket_type,RRP,discount,purchased_price,capacity
 -365,1,Ship8,28/4/2023,28/4/2022,80,WA,M,No,Interior_Mid,500,0.18,410,1000
 -365,1,Ship8,28/4/2023,28/4/2022,18,TAS,F,No,Interior_Mid,500,0.19,405,1000
 -365,1,Ship8,28/4/2023,28/4/2022,25,WA,M,No,Interior_Mid,500,0.29,355,1000

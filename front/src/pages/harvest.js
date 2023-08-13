@@ -8,14 +8,14 @@ import ProfileSection from '../components/ProfileSection';
 import CMQSection from '../components/CMQSection';
 import RecommendSection from '../components/Recommendation';
 const Harvest = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isopen, setisopen] = useState(+false);
   const toggle = () => {
-    setIsOpen(!isOpen)
+    setisopen(!isopen)
   }
   return (
     <>
       <ScrollToTop />
-      <Sidebar isOpen={isOpen} toggle={toggle}/>
+      <Sidebar isopen={isopen} toggle={toggle}/>
       <Navbar toggle={toggle}/>
       <Services />
       <BookingCurveSection />
@@ -25,5 +25,7 @@ const Harvest = () => {
     </>
   )
 }
+
+
 
 export default Harvest

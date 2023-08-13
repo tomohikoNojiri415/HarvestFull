@@ -27,7 +27,7 @@ export const NavbarContainer = styled.div`
   padding: 0 24px;
   max-width: 1100px;
 `
-export const NavLogo = styled(LinkS)`
+export const NavLogo = styled.div`
   color: #fff;
   //color: #ed9d7e;
   justify-self: flex-start; /* This is to make sure the logo is on the left side */

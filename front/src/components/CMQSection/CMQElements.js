@@ -70,6 +70,10 @@ export const CMQPara2 = styled.p`
 
 export const CMQList = styled.ul`
   margin-left: 20px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  line-height: 22px;
+  color: #3F4041;
 `;
 
 export const CMQChartWrapper = styled.div`

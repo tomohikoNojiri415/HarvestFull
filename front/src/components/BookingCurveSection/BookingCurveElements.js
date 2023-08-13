@@ -11,8 +11,8 @@ export const BookingContainer = styled.div`
 `
 
 export const BookingWrapper = styled.div`
-  display:inline-flex;
-  flex-wrap:wrap;
+  display: inline-flex;
+  flex-wrap: wrap;
   min-height: 100vh - 80px;
   width: 100%;
   padding: 3%;

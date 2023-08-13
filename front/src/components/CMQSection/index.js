@@ -71,6 +71,31 @@ var CMQOptions = {
   },
 };
 
+ // trim of dataset 
+const formatDataset = (dataset, start, end, n) => {
+  //trim dataset which has a longer date range than the (longest) historical data
+  if (start < -n + 1) {dataset = dataset.slice(-start - n + 1);}
+  const extendedDataset = [...dataset];
+  while (extendedDataset.length < n) {
+    extendedDataset.push(null); // Add null values to the end of the dataset until it reaches the desired length
+  }
+  return extendedDataset;
+}
+
+const fetchData = async (url) => {
+  const response = await fetch(url,{ method: 'GET', mode: 'cors', headers: { "Content-Type": "application/json",},});
+  const data = await response.json();
+  return data;
+};
+
+const setTitle = (TicketType) => {
+  if (TicketType === 'All') {
+    CMQOptions.plugins.title.text = 'CMQ Curve across all Ticket Types';
+  } else {
+    CMQOptions.plugins.title.text = `CMQ Curve for ${TicketType}`;
+  }
+}
+
 const CMQSection = () => {
   const [CMQId, setCMQId] = useState('historical');
   const [CMQIdList, setCMQIdList] = useState(['historical']);
@@ -88,224 +113,156 @@ const CMQSection = () => {
     ],
   });
 
-  // trim of dataset 
-  const formatDataset = (dataset, start, end, n) => {
-    //trim dataset which has a longer date range than the (longest) historical data
-    if (start < -n + 1) {dataset = dataset.slice(-start - n + 1);}
-    const extendedDataset = [...dataset];
-    while (extendedDataset.length < n) {
-      extendedDataset.push(null); // Add null values to the end of the dataset until it reaches the desired length
-    }
-    return extendedDataset;
-  }
 
   //fetching a list of ids
   //the resulting list has a 0 at the start when page load !!reserve 0 for no ship selected
   const fetchIds = () => {
-    fetch('http://127.0.0.1:5000/idlist',{
-      method: 'GET',
-      mode: 'cors',
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(data => {
-      //decode message
-      const res=data.json();
-      return res;
-    }).then((res)=>{
+    fetchData('http://127.0.0.1:5000/idlist').then((res)=>{
       setCMQIdList(['historical'].concat(res.data));
-    }).catch(err => {
-      console.log(err);
     })
   }
 
   const fetchTicketTypes = (id) => {
-    fetch(`http://127.0.0.1:5000/tickettypelist/${id}`,{
-      method: 'GET',
-      mode: 'cors',
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(data => {
-      //decode message
-      const res=data.json();
-      return res;
-    }).then((res)=>{
-      //console.log('TicketTypedata', res.data);
+    fetchData(`http://127.0.0.1:5000/tickettypelist/${id}`).then((res)=>{
       setCMQTicketTypeList(['All'].concat(res.data));
-    }).catch(err => {
-      console.log(err);
     })
   }
 
   //fetching specific data for a ship id
-  const fetchData = (id, TicketType) => {
-    if (TicketType === 'All') {
-      CMQOptions.plugins.title.text = 'CMQ Curve across all Ticket Types';
-    } else {
-      CMQOptions.plugins.title.text = `CMQ Curve for ${TicketType}`;
-    }
-
-    if (id === 'historical') {
-      const url = `http://127.0.0.1:5000/cmq/${TicketType}`;
-      // labels x-axis - array indicating weeks till end of CMQ
-      let labels = [];
-      //access api endpoint using get method
-      fetch(url,{
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then(data => {
-        //decode message
-        const res=data.json();
-        return res;
-      }).then((res)=>{
-        const mean = res.data.mean;
-        const lower = res.data.lower;
-        const upper = res.data.upper;
-        //res.data contains the data from the backend
-        //manipulate data
-        labels = Array.from({ length: mean.length }, (_, index) => -mean.length + 1 + index);
-        //update front end with data
-        setCMQData({
-          labels: labels,
-          datasets: [
-            // {
-            //   label:'Historical CMQs',
-            //   data: mean,
-            //   borderColor: 'rgba(75, 192, 192, 1)',
-            //   backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            // },
-            {
-              label: "Historical Mean",
-              type: "line",
-              backgroundColor: "rgb(1,33,105, 0.5)",
-              borderColor: "rgb(1,33,105)",
-              hoverBorderColor: "rgb(175, 192, 255)",
-              fill: false,
-              tension: 0,
-              data: mean,
-              yAxisID: 'y',
-              xAxisID: 'x'
-            },
-            {
-              label: "BandTop",
-              type: "line",
-              backgroundColor: "rgb(75, 192, 255, 0.5)",
-              borderColor: "transparent",
-              pointRadius: 0,
-              fill: 0,
-              tension: 0,
-              data: upper,
-              yAxisID: 'y',
-              xAxisID: 'x'
-            },
-            {
-              label: "BandBottom",
-              type: "line",
-              backgroundColor: "rgb(75, 192, 255, 0.5)",
-              borderColor: "transparent",
-              pointRadius: 0,
-              fill: 0,
-              tension: 0,
-              data: lower,
-              yAxisID: 'y',
-              xAxisID: 'x'
-            },
-          ],
-        });
-      }).catch(err => {
-        console.log(err);
-      })
-    } else {
-      //id = parseInt(id);
-      const url = `http://127.0.0.1:5000/cmq/${id}/${TicketType}`;
-      fetch(url,{
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then(data => {
-        //decode message
-        const res=data.json();
-        return res;
-      }).then((res)=>{
-        //res.data contains the data from the backend
-        //manipulate data
-        const mean = res.data.his.mean;
-        const lower = res.data.his.lower;
-        const upper = res.data.his.upper;
-        var dataset = formatDataset(res.data.cur.data, res.data.cur.lower, res.data.cur.upper, CMQData.labels.length);
-        setCMQData((prevData) => {
-          //make the dataset as long as the historical data fill with nulls
-          return {
-            labels: prevData.labels,
-            //keep the order so the id curve is always on top
-            datasets: [
-            {
-              label: "Historical Mean",
-              type: "line",
-              backgroundColor: "rgb(1,33,105, 0.5)",
-              borderColor: "rgb(1,33,105)",
-              hoverBorderColor: "rgb(175, 192, 255)",
-              fill: false,
-              tension: 0,
-              data: mean,
-              yAxisID: 'y',
-              xAxisID: 'x'
-            },
-            {
-              label: "BandTop",
-              type: "line",
-              backgroundColor: "rgb(75, 192, 255, 0.5)",
-              borderColor: "transparent",
-              pointRadius: 0,
-              fill: 0,
-              tension: 0,
-              data: upper,
-              yAxisID: 'y',
-              xAxisID: 'x'
-            },
-            {
-              label: "BandBottom",
-              type: "line",
-              backgroundColor: "rgb(75, 192, 255, 0.5)",
-              borderColor: "transparent",
-              pointRadius: 0,
-              fill: 0,
-              tension: 0,
-              data: lower,
-              yAxisID: 'y',
-              xAxisID: 'x'
-            },
-            {
-              label: `${id}`,
-              type: "line",
-              backgroundColor: "rgb(200,16,46, 0.5)",
-              borderColor: "rgba(200,16,46, 1)",
-              hoverBorderColor: "rgb(255,97,36)",
-              fill: false,
-              tension: 0,
-              data: dataset,
-              yAxisID: 'y',
-              xAxisID: 'x'
-            },
-            ],
-          }
-        });
-      }).catch(err => {
-        console.log(err);
-      })
-    }
+  const fetchDataHistorical = (TicketType) => {
+    setTitle(TicketType);
+    const url = `http://127.0.0.1:5000/cmq/${TicketType}`;
+    // labels x-axis - array indicating weeks till end of CMQ
+    //access api endpoint using get method
+    fetchData(url).then((res)=>{
+      const mean = res.data.mean;
+      const lower = res.data.lower;
+      const upper = res.data.upper;
+      //res.data contains the data from the backend
+      //manipulate data
+      let labels = Array.from({ length: mean.length }, (_, index) => -mean.length + 1 + index);
+      //update front end with data
+      setCMQData({
+        labels: labels,
+        datasets: [
+          {
+            label: "Historical Mean",
+            type: "line",
+            backgroundColor: "rgb(1,33,105, 0.5)",
+            borderColor: "rgb(1,33,105)",
+            hoverBorderColor: "rgb(175, 192, 255)",
+            fill: false,
+            tension: 0,
+            data: mean,
+            yAxisID: 'y',
+            xAxisID: 'x'
+          },
+          {
+            label: "BandTop",
+            type: "line",
+            backgroundColor: "rgb(75, 192, 255, 0.5)",
+            borderColor: "transparent",
+            pointRadius: 0,
+            fill: 0,
+            tension: 0,
+            data: upper,
+            yAxisID: 'y',
+            xAxisID: 'x'
+          },
+          {
+            label: "BandBottom",
+            type: "line",
+            backgroundColor: "rgb(75, 192, 255, 0.5)",
+            borderColor: "transparent",
+            pointRadius: 0,
+            fill: 0,
+            tension: 0,
+            data: lower,
+            yAxisID: 'y',
+            xAxisID: 'x'
+          },
+        ],
+      });
+    })
   }
 
   useEffect(() => {
+    const fetchDataSpec = (id, TicketType) => {
+    setTitle(TicketType);
+    const url = `http://127.0.0.1:5000/cmq/${id}/${TicketType}`;
+    fetchData(url).then((res)=>{
+      //res.data contains the data from the backend
+      //manipulate data
+      const mean = res.data.his.mean;
+      const lower = res.data.his.lower;
+      const upper = res.data.his.upper;
+      var dataset = formatDataset(res.data.cur.data, res.data.cur.lower, res.data.cur.upper, CMQData.labels.length);
+      setCMQData((prevData) => {
+        //make the dataset as long as the historical data fill with nulls
+        return {
+          labels: prevData.labels,
+          //keep the order so the id curve is always on top
+          datasets: [
+          {
+            label: "Historical Mean",
+            type: "line",
+            backgroundColor: "rgb(1,33,105, 0.5)",
+            borderColor: "rgb(1,33,105)",
+            hoverBorderColor: "rgb(175, 192, 255)",
+            fill: false,
+            tension: 0,
+            data: mean,
+            yAxisID: 'y',
+            xAxisID: 'x'
+          },
+          {
+            label: "BandTop",
+            type: "line",
+            backgroundColor: "rgb(75, 192, 255, 0.5)",
+            borderColor: "transparent",
+            pointRadius: 0,
+            fill: 0,
+            tension: 0,
+            data: upper,
+            yAxisID: 'y',
+            xAxisID: 'x'
+          },
+          {
+            label: "BandBottom",
+            type: "line",
+            backgroundColor: "rgb(75, 192, 255, 0.5)",
+            borderColor: "transparent",
+            pointRadius: 0,
+            fill: 0,
+            tension: 0,
+            data: lower,
+            yAxisID: 'y',
+            xAxisID: 'x'
+          },
+          {
+            label: `${id}`,
+            type: "line",
+            backgroundColor: "rgb(200,16,46, 0.5)",
+            borderColor: "rgba(200,16,46, 1)",
+            hoverBorderColor: "rgb(255,97,36)",
+            fill: false,
+            tension: 0,
+            data: dataset,
+            yAxisID: 'y',
+            xAxisID: 'x'
+          },
+          ],
+        }
+      });
+    })
+  }
     fetchTicketTypes(CMQId);
-    fetchData(CMQId,CMQTicketType);
-  }, [CMQId,CMQTicketType]);
+    if (CMQId === 'historical') {
+      fetchDataHistorical(CMQTicketType);
+    } else {
+      fetchDataSpec(CMQId, CMQTicketType);
+    }
+  }, [CMQId,CMQTicketType, CMQData.labels.length]);
 
   useEffect(() => {
     fetchIds();
@@ -346,12 +303,13 @@ const CMQSection = () => {
                 a ticket being sold, the CMQ would be 0.<br /><br />
 
                 By tracking the cumulative CMQ we can improve overall yield by recognising that we can sell:
-                <CMQList>
+              
+              </CMQPara2>
+              <CMQList>
                   <li>More tickets,</li>
                   <li>Higher priced tickets or,</li>
                   <li>More tickets at the higher price points.</li>
                 </CMQList>
-              </CMQPara2>
             </CMQContentWrapper>
           </CMQColumn1>
           <CMQColumn2>

@@ -304,10 +304,10 @@ def get_cmq_spec(id,ticketType):
 @app.route('/profile/<id>/<week>/<variable>', methods=['GET'])
 def get_profile(id,week,variable):
     #print('get_profile',id,week,variable)
-    response_data = None
+    response_data = {'ctype': 'line', 'data': [{'x': 0, 'y': 0}]}
     if variable != '(variable)':
         response_data = profile(id,week,variable)
-    #print(response_data)
+    print('profile',response_data)
     return jsonify(data=response_data, message="message Success")
 
 #profileweeks
